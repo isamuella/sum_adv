@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create/Edit Event - CivicEvents</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body class="bg-gray-50">
+
+  <!-- Navigation Bar -->
+  <nav class="navbar bg-white sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <a href="/index.html" class="flex items-center space-x-2">
+          <span class="text-2xl font-bold text-gray-800">CivicEvents</span>
+        </a>
+        <div class="flex items-center space-x-4">
+          <div class="relative group">
+            <button id="profileBtn" class="text-gray-700 font-medium">Profile</button>
+            <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+              <button id="logoutBtn" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition">Logout</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    <h1 id="pageTitle" class="text-4xl font-bold text-gray-800 mb-8">Create New Event</h1>
+
+    <!-- Form -->
+    <div class="bg-white rounded-lg shadow-lg p-8">
+      <form id="eventForm" class="space-y-6">
+        <!-- Title -->
+        <div class="form-group">
+          <label for="title" class="block text-sm font-bold text-gray-700 mb-2">Event Title *</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            placeholder="e.g., Community Cleanup Drive"
+            required
+            aria-label="Event title"
+          >
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="description" class="block text-sm font-bold text-gray-700 mb-2">Description *</label>
+          <textarea
+            id="description"
+            name="description"
+            placeholder="Describe the event in detail..."
+            rows="5"
+            required
+            aria-label="Event description"
+          ></textarea>
+        </div>
+
+        <!-- Location -->
+        <div class="form-group">
+          <label for="location" class="block text-sm font-bold text-gray-700 mb-2">Location *</label>
+          <input
+            type="text"
+            id="location"
+            name="location"
+            placeholder="e.g., Central Park, Downtown Square"
+            required
+            aria-label="Event location"
+          >
+        </div>
+
+        <!-- Date/Time Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="form-group">
+            <label for="starts_at" class="block text-sm font-bold text-gray-700 mb-2">Start Date & Time *</label>
+            <input
+              type="datetime-local"
+              id="starts_at"
+              name="starts_at"
+              required
+              aria-label="Start date and time"
+            >
+          </div>
+          <div class="form-group">
+            <label for="ends_at" class="block text-sm font-bold text-gray-700 mb-2">End Date & Time *</label>
+            <input
+              type="datetime-local"
+              id="ends_at"
+              name="ends_at"
+              required
+              aria-label="End date and time"
+            >
+          </div>
+        </div>
+
+        <!-- Image Upload -->
+        <div class="form-group">
+          <label for="image" class="block text-sm font-bold text-gray-700 mb-2">Event Image (Optional)</label>
+          <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 transition cursor-pointer" id="imageDropZone">
+            <svg class="w-12 h-12 mx-auto text-gray-400 mb-2" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path>
+            </svg>
+            <p class="text-gray-600 font-medium">Click or drag image here</p>
+            <p class="text-gray-500 text-sm">JPG, PNG (Max 5MB)</p>
+            <input
+              type="file"
+              id="image"
+              name="image"
+              accept="image/*"
+              class="hidden"
+              aria-label="Upload event image"
+            >
+          </div>
+          <!-- Image Preview -->
+          <div id="imagePreviewContainer" class="mt-4 hidden">
+            <img id="imagePreview" class="max-h-64 rounded-lg shadow" alt="Preview">
+            <button type="button" id="removeImageBtn" class="mt-2 btn-danger btn-small">Remove Image</button>
+          </div>
+        </div>
+
+        <!-- Published Toggle -->
+        <div class="form-group">
+          <label class="flex items-center space-x-3 cursor-pointer">
+            <input type="checkbox" id="published" name="published" class="w-5 h-5 rounded">
+            <span class="text-gray-700 font-medium">Publish this event immediately</span>
+          </label>
+          <p class="text-sm text-gray-500 mt-1">Unpublished events will only be visible to admins</p>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex gap-4 pt-6 border-t">
+          <button type="submit" class="flex-1 btn-primary py-3">
+            <span id="submitBtnText">Create Event</span>
+          </button>
+          <button type="button" id="cancelBtn" class="flex-1 btn-secondary py-3">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script type="module" src="../../js/app.js"></script>
+  <script type="module">
+    import { apiCall, logoutUser } from '../js/utils/api.js';
+    import { showError, showSuccess } from '../js/utils/ui-helpers.js';
+
+    if (!window.appState?.isAuthenticated || window.appState.user.role !== 'admin') {
+      window.location.href = '/login.html';
+    }
+
+    let editEventId = null;
+    let selectedImage = null;
+
+    // Initialize
+    async function init() {
+      setupNavigation();
+      setupImageUpload();
+      setupFormHandling();
+
+      // Check if editing
+      const urlParams = new URLSearchParams(window.location.search);
+      editEventId = urlParams.get('id');
+
+      if (editEventId) {
+        await loadEventData(editEventId);
+      }
+    }
+
+    function setupNavigation() {
+      document.getElementById('profileBtn').addEventListener('click', () => {
+        document.getElementById('profileDropdown').classList.toggle('hidden');
+      });
+
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        logoutUser();
+        showSuccess('Logged out');
+        setTimeout(() => window.location.href = '/login.html', 1000);
+      });
+
+      document.getElementById('cancelBtn').addEventListener('click', () => {
+        window.location.href = '/admin/dashboard.html';
+      });
+    }
+
+    function setupImageUpload() {
+      const dropZone = document.getElementById('imageDropZone');
+      const imageInput = document.getElementById('image');
+      const previewContainer = document.getElementById('imagePreviewContainer');
+      const preview = document.getElementById('imagePreview');
+
+      // Click to upload
+      dropZone.addEventListener('click', () => imageInput.click());
+
+      // Drag and drop
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('border-blue-500', 'bg-blue-50');
+      });
+
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+        handleFileSelect(e.dataTransfer.files[0]);
+      });
+
+      // File input change
+      imageInput.addEventListener('change', (e) => {
+        if (e.target.files[0]) {
+          handleFileSelect(e.target.files[0]);
+        }
+      });
+
+      // Remove image button
+      document.getElementById('removeImageBtn').addEventListener('click', () => {
+        selectedImage = null;
+        imageInput.value = '';
+        previewContainer.classList.add('hidden');
+        preview.src = '';
+      });
+
+      function handleFileSelect(file) {
+        if (!file.type.startsWith('image/')) {
+          showError('Please select a valid image file');
+          return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          showError('Image must be smaller than 5MB');
+          return;
+        }
+
+        selectedImage = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          preview.src = e.target.result;
+          previewContainer.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function loadEventData(eventId) {
+      const response = await apiCall(`/events/${eventId}`);
+      if (!response?.data) {
+        showError('Failed to load event');
+        return;
+      }
+
+      const event = response.data;
+      document.getElementById('pageTitle').textContent = 'Edit Event';
+      document.getElementById('submitBtnText').textContent = 'Update Event';
+
+      document.getElementById('title').value = event.title;
+      document.getElementById('description').value = event.description;
+      document.getElementById('location').value = event.location;
+      document.getElementById('published').checked = event.published;
+
+      // Format datetime
+      document.getElementById('starts_at').value = new Date(event.starts_at).toISOString().slice(0, 16);
+      document.getElementById('ends_at').value = new Date(event.ends_at).toISOString().slice(0, 16);
+
+      // Show existing image if any
+      if (event.metadata?.image_url) {
+        document.getElementById('imagePreview').src = event.metadata.image_url;
+        document.getElementById('imagePreviewContainer').classList.remove('hidden');
+      }
+    }
+
+    function setupFormHandling() {
+      document.getElementById('eventForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('title', document.getElementById('title').value);
+        formData.append('description', document.getElementById('description').value);
+        formData.append('location', document.getElementById('location').value);
+        formData.append('starts_at', document.getElementById('starts_at').value);
+        formData.append('ends_at', document.getElementById('ends_at').value);
+        formData.append('published', document.getElementById('published').checked);
+
+        if (selectedImage) {
+          formData.append('image', selectedImage);
+        }
+
+        const method = editEventId ? 'PUT' : 'POST';
+        const endpoint = editEventId ? `/events/${editEventId}` : '/events';
+
+        try {
+          const response = await apiCall(endpoint, {
+            method,
+            body: formData,
+            headers: {} // FormData sets Content-Type automatically
+          });
+
+          if (response) {
+            showSuccess(editEventId ? 'Event updated!' : 'Event created!');
+            setTimeout(() => {
+              window.location.href = '/admin/dashboard.html';
+            }, 1500);
+          }
+        } catch (error) {
+          console.error('Form submission error:', error);
+        }
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>

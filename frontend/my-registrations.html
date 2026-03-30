@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Registrations - CivicEvents</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body class="bg-gray-50">
+
+  <!-- Navigation Bar -->
+  <nav class="navbar bg-white sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <!-- Logo -->
+        <a href="/index.html" class="flex items-center space-x-2">
+          <span class="text-xl font-bold text-gray-800">CivicEvents</span>
+        </a>
+
+        <!-- Center Navigation Links -->
+        <div class="hidden md:flex space-x-6">
+          <a href="/index.html" class="nav-link font-medium">Dashboard</a>
+          <a href="/events.html" class="nav-link font-medium">Events</a>
+          <a href="/announcements.html" class="nav-link font-medium">Announcements</a>
+          <a href="/promos.html" class="nav-link font-medium">Promos</a>
+        </div>
+
+        <!-- Right Side: Notifications, Profile -->
+        <div class="flex items-center space-x-4">
+          <!-- Notifications Bell -->
+          <button id="notificationBell" class="relative text-gray-700 hover:text-blue-600 transition" aria-label="Notifications">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0018 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+            </svg>
+            <span id="notificationCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
+          </button>
+
+          <!-- Profile Dropdown -->
+          <div class="relative group">
+            <button id="profileBtn" class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition" aria-label="User menu">
+              <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                <span id="userInitial">U</span>
+              </div>
+            </button>
+            <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+              <p class="px-4 py-2 text-sm text-gray-600">Signed in as</p>
+              <p id="userName" class="px-4 font-semibold text-gray-800">User Name</p>
+              <hr class="my-2">
+              <a href="/profile.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">My Profile</a>
+              <a href="/my-registrations.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">My Registrations</a>
+              <div id="adminPanelLink" class="hidden">
+                <hr class="my-2">
+                <a href="/admin/dashboard.html" class="block px-4 py-2 text-blue-600 hover:bg-blue-50 transition font-medium">Admin Panel</a>
+              </div>
+              <hr class="my-2">
+              <button id="logoutBtn" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition">Logout</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold text-gray-800 mb-2">My Event Registrations</h1>
+    <p class="text-gray-600 mb-8">View your registered events and submit feedback</p>
+
+    <!-- Registrations List -->
+    <div id="registrationsList" class="space-y-6">
+      <p class="text-gray-500">Loading your registrations...</p>
+    </div>
+  </main>
+
+  <!-- Event Detail Modal -->
+  <div id="eventModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-gray-800">Event Details</h2>
+        <button id="closeEventModal" class="text-gray-600 hover:text-gray-800 text-2xl">&times;</button>
+      </div>
+      <div id="eventModalContent" class="p-6"></div>
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+  <div id="feedbackModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg max-w-md w-full">
+      <div class="border-b border-gray-200 p-6 flex items-center justify-between">
+        <h2 class="text-xl font-bold text-gray-800">Submit Feedback</h2>
+        <button id="closeFeedbackModal" class="text-gray-500 hover:text-gray-700">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <!-- Rating -->
+        <div class="form-group">
+          <label class="block text-sm font-bold text-gray-700 mb-3">Rating</label>
+          <div class="flex space-x-2" id="ratingStars">
+            <button type="button" class="star-btn text-4xl text-gray-300 transition hover:text-yellow-400" data-rating="1">⭐</button>
+            <button type="button" class="star-btn text-4xl text-gray-300 transition hover:text-yellow-400" data-rating="2">⭐</button>
+            <button type="button" class="star-btn text-4xl text-gray-300 transition hover:text-yellow-400" data-rating="3">⭐</button>
+            <button type="button" class="star-btn text-4xl text-gray-300 transition hover:text-yellow-400" data-rating="4">⭐</button>
+            <button type="button" class="star-btn text-4xl text-gray-300 transition hover:text-yellow-400" data-rating="5">⭐</button>
+          </div>
+          <p id="selectedRating" class="text-sm text-gray-500 mt-2">Click stars to rate</p>
+        </div>
+
+        <!-- Comment -->
+        <div class="form-group">
+          <label for="comment" class="block text-sm font-bold text-gray-700 mb-2">Your Feedback</label>
+          <textarea
+            id="comment"
+            placeholder="Share your feedback about this event..."
+            rows="4"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+          ></textarea>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex gap-2">
+          <button id="submitFeedbackBtn" class="flex-1 btn-primary py-2">Submit Feedback</button>
+          <button type="button" class="flex-1 btn-secondary py-2" onclick="document.getElementById('feedbackModal').classList.add('hidden')">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-gray-300 py-8 mt-12">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <p>&copy; 2026 CivicEvents. Connecting communities through events.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="./js/app.js"></script>
+  <script type="module">
+    import { apiCall, logoutUser } from './js/utils/api.js';
+    import { showError, showSuccess } from './js/utils/ui-helpers.js';
+
+    if (!window.appState?.isAuthenticated) {
+      window.location.href = '/login.html';
+    }
+
+    let currentEventId = null;
+    let selectedRating = 0;
+
+    async function init() {
+      setupNavigation();
+      await loadNotifications();
+      await loadMyRegistrations();
+      setupFeedbackModal();
+    }
+
+    function setupNavigation() {
+      const user = window.appState.user;
+      
+      // Populate navbar
+      document.getElementById('userInitial').textContent = user.full_name.charAt(0).toUpperCase();
+      document.getElementById('userName').textContent = user.full_name;
+
+      // Show admin panel link if admin
+      if (user.role === 'admin') {
+        document.getElementById('adminPanelLink').classList.remove('hidden');
+      }
+
+      // Profile dropdown toggle
+      document.getElementById('profileBtn').addEventListener('click', () => {
+        document.getElementById('profileDropdown').classList.toggle('hidden');
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#profileBtn') && !e.target.closest('#profileDropdown')) {
+          document.getElementById('profileDropdown').classList.add('hidden');
+        }
+      });
+
+      // Notifications bell
+      document.getElementById('notificationBell').addEventListener('click', () => {
+        window.location.href = '/notifications.html';
+      });
+
+      // Logout
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        logoutUser();
+        showSuccess('You have been logged out');
+        setTimeout(() => {
+          window.location.href = '/login.html';
+        }, 1000);
+      });
+    }
+
+    async function loadNotifications() {
+      const response = await apiCall('/notifications');
+      if (response && response.data) {
+        const unreadCount = response.data.filter(n => !n.read).length;
+        document.getElementById('notificationCount').textContent = unreadCount;
+      }
+    }
+
+    async function loadMyRegistrations() {
+      const response = await apiCall('/event-registrations/my-registrations');
+      
+      // Handle the response - apiCall normalizes it to be the data array directly
+      let registrations = [];
+      if (Array.isArray(response)) {
+        registrations = response;
+      } else if (response && typeof response === 'object') {
+        // Fallback in case response structure is unexpected
+        if (Array.isArray(response.data)) {
+          registrations = response.data;
+        } else {
+          registrations = [];
+        }
+      }
+
+      if (registrations.length === 0) {
+        document.getElementById('registrationsList').innerHTML = '<p class="text-gray-500">Failed to load registrations</p>';
+        return;
+      }
+
+      // Filter out cancelled registrations
+      registrations = registrations.filter(reg => reg.status !== 'cancelled');
+
+      if (registrations.length === 0) {
+        document.getElementById('registrationsList').innerHTML = '<p class="text-gray-500 text-center py-12">You haven\'t registered for any events yet. <a href="/events.html" class="text-blue-600 hover:underline">Browse events →</a></p>';
+        return;
+      }
+
+      // Load user's feedback
+      const feedbackResponse = await apiCall('/event-feedback/my-feedback');
+      const allFeedback = feedbackResponse && (Array.isArray(feedbackResponse) ? feedbackResponse : feedbackResponse.data || []);
+
+      document.getElementById('registrationsList').innerHTML = registrations.map((reg, index) => {
+        const feedback = allFeedback.find(f => f.event_id === reg.event_id);
+        const eventTitle = reg.title || 'Event';
+        const eventLocation = reg.location || 'TBA';
+        const eventDesc = reg.description || 'No description available';
+        const eventDate = reg.starts_at ? new Date(reg.starts_at).toLocaleDateString() : 'TBA';
+        const eventTime = reg.starts_at ? new Date(reg.starts_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'TBA';
+        
+        return `
+          <div class="card">
+            <div class="flex items-start justify-between mb-4">
+              <div>
+                <h3 class="text-xl font-bold text-gray-800">${eventTitle}</h3>
+                <p class="text-gray-600 mt-1">📍 ${eventLocation}</p>
+              </div>
+              <span class="badge badge-success">Registered</span>
+            </div>
+
+            <p class="text-gray-600 mb-4">${eventDesc.substring(0, 150)}${eventDesc.length > 150 ? '...' : ''}</p>
+
+            <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
+              <div>
+                <p class="text-gray-500">Date</p>
+                <p class="font-medium text-gray-800">${eventDate}</p>
+              </div>
+              <div>
+                <p class="text-gray-500">Time</p>
+                <p class="font-medium text-gray-800">${eventTime}</p>
+              </div>
+            </div>
+
+            ${feedback ? `
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <h4 class="font-bold text-gray-800">Your Feedback</h4>
+                <p class="text-xl my-2">${'⭐'.repeat(feedback.rating)}</p>
+                <p class="text-gray-600">${feedback.comment}</p>
+              </div>
+            ` : ''}
+
+            <div class="flex gap-2">
+              <button onclick="window.viewEventDetail('${reg.event_id}')" class="flex-1 btn-secondary py-2">View Event</button>
+              <button onclick="window.cancelReg('${reg.event_id}')" class="flex-1 btn-danger py-2">Cancel Registration</button>
+              ${!feedback ? `<button onclick="window.openFeedbackModal('${reg.event_id}')" class="flex-1 btn-primary py-2">Leave Feedback</button>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setupFeedbackModal() {
+      const starBtns = document.querySelectorAll('.star-btn');
+      
+      starBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          selectedRating = parseInt(btn.dataset.rating);
+          updateStarDisplay();
+        });
+
+        btn.addEventListener('mouseenter', (e) => {
+          const rating = parseInt(btn.dataset.rating);
+          starBtns.forEach((b, i) => {
+            if (i < rating) {
+              b.classList.remove('text-gray-300');
+              b.classList.add('text-yellow-400');
+            }
+          });
+        });
+      });
+
+      document.getElementById('ratingStars').addEventListener('mouseleave', updateStarDisplay);
+
+      document.getElementById('closeFeedbackModal').addEventListener('click', () => {
+        document.getElementById('feedbackModal').classList.add('hidden');
+        resetFeedbackForm();
+      });
+
+      document.getElementById('submitFeedbackBtn').addEventListener('click', submitFeedback);
+    }
+
+    function updateStarDisplay() {
+      const starBtns = document.querySelectorAll('.star-btn');
+      starBtns.forEach((btn, i) => {
+        if (i < selectedRating) {
+          btn.classList.remove('text-gray-300');
+          btn.classList.add('text-yellow-400');
+        } else {
+          btn.classList.remove('text-yellow-400');
+          btn.classList.add('text-gray-300');
+        }
+      });
+
+      if (selectedRating > 0) {
+        document.getElementById('selectedRating').textContent = `${selectedRating} star${selectedRating > 1 ? 's' : ''} selected`;
+      }
+    }
+
+    function resetFeedbackForm() {
+      selectedRating = 0;
+      document.getElementById('comment').value = '';
+      updateStarDisplay();
+      // Don't reset currentEventId here - it's set by openFeedbackModal
+    }
+
+    async function submitFeedback() {
+      if (!currentEventId) {
+        showError('Error: Event ID is missing. Please close and try again.');
+        return;
+      }
+
+      if (selectedRating === 0) {
+        showError('Please select a rating');
+        return;
+      }
+
+      const comment = document.getElementById('comment').value.trim();
+      if (!comment) {
+        showError('Please provide your feedback comments');
+        return;
+      }
+
+      try {
+        const response = await apiCall('/event-feedback', {
+          method: 'POST',
+          body: JSON.stringify({
+            event_id: currentEventId,
+            rating: selectedRating,
+            comment: comment
+          })
+        });
+
+        if (response) {
+          showSuccess('Feedback submitted successfully!');
+          document.getElementById('feedbackModal').classList.add('hidden');
+          currentEventId = null; // Reset after successful submission
+          resetFeedbackForm();
+          await loadMyRegistrations();
+        } else {
+          showError('Failed to submit feedback. Please try again.');
+        }
+      } catch (error) {
+        console.error('Submit feedback error:', error);
+        showError('Failed to submit feedback. Please try again.');
+      }
+    }
+
+    window.viewEventDetail = async (eventId) => {
+      try {
+        const response = await apiCall('/events/' + eventId);
+        if (!response?.data) {
+          showError('Failed to load event');
+          return;
+        }
+        const event = response.data;
+
+        // Only admins can view event feedback
+        let feedbackList = [];
+        let avgRating = 'N/A';
+        const user = window.appState?.user || {};
+
+        if (user.role === 'admin') {
+          const feedbackResponse = await apiCall('/event-feedback/event/' + eventId);
+          feedbackList = feedbackResponse?.data || [];
+          avgRating = feedbackList.length > 0 ? (feedbackList.reduce((sum, f) => sum + f.rating, 0) / feedbackList.length).toFixed(1) : 'N/A';
+        }
+        
+        let html = '<h3 class="text-2xl font-bold text-gray-800 mb-4">' + event.title + '</h3>';
+        if (event.metadata?.image_url) {
+          html = '<img src="' + event.metadata.image_url + '" alt="' + event.title + '" class="w-full h-64 object-cover rounded-lg mb-6">' + html;
+        }
+        html += '<div class="text-sm text-gray-600 mb-4">📍 ' + event.location + ' | 📅 ' + new Date(event.starts_at).toLocaleDateString() + '</div>';
+        html += '<div><h4 class="font-bold text-gray-800 mb-2">Description</h4><p class="text-gray-600">' + event.description + '</p></div>';
+
+        if (user.role === 'admin') {
+          html += '<div><h4 class="font-bold text-gray-800 mb-2">Feedback (' + avgRating + '⭐)</h4>';
+          if (feedbackList.length === 0) {
+            html += '<p class="text-gray-500">No feedback yet</p>';
+          } else {
+            html += '<div class="space-y-3">';
+            feedbackList.forEach(f => {
+              html += '<div class="bg-gray-50 p-3 rounded"><div>' + Array(f.rating).fill('⭐').join('') + '</div><p class="text-sm text-gray-600">' + f.comment + '</p></div>';
+            });
+            html += '</div>';
+          }
+          html += '</div>';
+        } else {
+          html += '<div><h4 class="font-bold text-gray-800 mb-2">Event Feedback</h4><p class="text-gray-500">You can submit your own feedback after attending the event.</p></div>';
+        }
+        
+        document.getElementById('eventModalContent').innerHTML = html;
+        document.getElementById('eventModal').classList.remove('hidden');
+        document.getElementById('closeEventModal').onclick = () => document.getElementById('eventModal').classList.add('hidden');
+      } catch (err) {
+        console.error(err);
+        showError('Error loading event');
+      }
+    };
+
+    window.openFeedbackModal = (eventId) => {
+      if (eventId) {
+        currentEventId = eventId;
+        resetFeedbackForm();
+        document.getElementById('feedbackModal').classList.remove('hidden');
+      } else {
+        showError('Error: Could not determine which event to submit feedback for. Try refreshing the page.');
+      }
+    };
+
+    window.cancelReg = async (eventId) => {
+      if (!confirm('Are you sure you want to cancel this registration?')) return;
+
+      try {
+        console.log('Attempting to cancel registration for event:', eventId);
+        const response = await apiCall('/event-registrations/cancel', {
+          method: 'POST',
+          body: JSON.stringify({ event_id: eventId })
+        });
+        console.log('Cancel response:', response);
+
+        if (response) {
+          showSuccess('Registration cancelled successfully');
+          await loadMyRegistrations();
+        } else {
+          showError('Failed to cancel registration. Please try again.');
+        }
+      } catch (err) {
+        console.error('Cancel registration error:', err);
+        showError('Failed to cancel registration. Please try again.');
+      }
+    };
+
+    init();
+  </script>
+</body>
+</html>

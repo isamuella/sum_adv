@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Announcement - CivicEvents</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body class="bg-gray-50">
+
+  <!-- Navigation Bar -->
+  <nav class="navbar bg-white sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <a href="/index.html" class="text-xl font-bold text-gray-800">CivicEvents</a>
+        <button id="logoutBtn" class="btn-danger btn-small">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    <h1 id="pageTitle" class="text-4xl font-bold text-gray-800 mb-8">Create New Announcement</h1>
+
+    <!-- Form -->
+    <div class="bg-white rounded-lg shadow-lg p-8">
+      <form id="announcementForm" class="space-y-6">
+        <!-- Title -->
+        <div class="form-group">
+          <label for="title" class="block text-sm font-bold text-gray-700 mb-2">Announcement Title *</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            placeholder="e.g., New Park Opening Announcement"
+            required
+            aria-label="Announcement title"
+          >
+        </div>
+
+        <!-- Audio Upload -->
+        <div class="form-group">
+          <label for="audio" class="block text-sm font-bold text-gray-700 mb-2">Audio File *</label>
+          <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 transition cursor-pointer" id="audioDropZone">
+            <svg class="w-12 h-12 mx-auto text-gray-400 mb-2" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9 3v2H5v2h4v2H5v2h4v2H5v2h4v2h2V3H9z"></path>
+            </svg>
+            <p class="text-gray-600 font-medium">Click or drag audio file here</p>
+            <p class="text-gray-500 text-sm">MP3, WAV, OGG (Max 5MB)</p>
+            <input
+              type="file"
+              id="audio"
+              name="audio"
+              accept="audio/*"
+              class="hidden"
+              required
+              aria-label="Upload audio file"
+            >
+          </div>
+          <div id="audioPreviewContainer" class="mt-4 hidden">
+            <p class="text-sm text-gray-600">Selected: <span id="audioFileName"></span></p>
+            <button type="button" id="removeAudioBtn" class="mt-2 btn-danger btn-small">Remove Audio</button>
+          </div>
+        </div>
+
+        <!-- Transcript (Optional) -->
+        <div class="form-group">
+          <label for="transcript" class="block text-sm font-bold text-gray-700 mb-2">Transcript (Optional)</label>
+          <textarea
+            id="transcript"
+            name="transcript"
+            placeholder="Provide a text version of the announcement for accessibility..."
+            rows="4"
+            aria-label="Announcement transcript"
+          ></textarea>
+          <p class="text-xs text-gray-500 mt-1">Helps users with hearing disabilities</p>
+        </div>
+
+        <!-- Published Toggle -->
+        <div class="form-group">
+          <label class="flex items-center space-x-3 cursor-pointer">
+            <input type="checkbox" id="published" name="published" class="w-5 h-5 rounded">
+            <span class="text-gray-700 font-medium">Publish this announcement immediately</span>
+          </label>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex gap-4 pt-6 border-t">
+          <button type="submit" class="flex-1 btn-primary py-3">
+            <span id="submitBtnText">Create Announcement</span>
+          </button>
+          <button type="button" id="cancelBtn" class="flex-1 btn-secondary py-3">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script type="module" src="../../js/app.js"></script>
+  <script type="module">
+    import { apiCall, logoutUser } from '../js/utils/api.js';
+    import { showError, showSuccess } from '../js/utils/ui-helpers.js';
+
+    if (!window.appState?.isAuthenticated || window.appState.user.role !== 'admin') {
+      window.location.href = '/login.html';
+    }
+
+    let editAnnouncementId = null;
+    let selectedAudio = null;
+
+    async function init() {
+      setupNavigation();
+      setupAudioUpload();
+      setupFormHandling();
+
+      // Check if editing
+      const urlParams = new URLSearchParams(window.location.search);
+      editAnnouncementId = urlParams.get('id');
+
+      if (editAnnouncementId) {
+        await loadAnnouncementData(editAnnouncementId);
+      }
+    }
+
+    function setupNavigation() {
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        logoutUser();
+        showSuccess('Logged out');
+        setTimeout(() => window.location.href = '/login.html', 1000);
+      });
+
+      document.getElementById('cancelBtn').addEventListener('click', () => {
+        window.location.href = '/announcements.html';
+      });
+    }
+
+    function setupAudioUpload() {
+      const dropZone = document.getElementById('audioDropZone');
+      const audioInput = document.getElementById('audio');
+      const previewContainer = document.getElementById('audioPreviewContainer');
+
+      // Click to upload
+      dropZone.addEventListener('click', () => audioInput.click());
+
+      // Drag and drop
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('border-blue-500', 'bg-blue-50');
+      });
+
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+        handleFileSelect(e.dataTransfer.files[0]);
+      });
+
+      // File input change
+      audioInput.addEventListener('change', (e) => {
+        if (e.target.files[0]) {
+          handleFileSelect(e.target.files[0]);
+        }
+      });
+
+      // Remove button
+      document.getElementById('removeAudioBtn').addEventListener('click', () => {
+        selectedAudio = null;
+        audioInput.value = '';
+        previewContainer.classList.add('hidden');
+      });
+
+      function handleFileSelect(file) {
+        // Allow common audio formats including OGG which some browsers don't recognize
+        const validAudioTypes = ['audio/', 'application/ogg', 'audio/ogg'];
+        const isValidAudio = validAudioTypes.some(type => 
+          file.type.startsWith(type) || file.name.endsWith('.ogg') || file.name.endsWith('.oga')
+        );
+        
+        if (!isValidAudio) {
+          showError('Please select a valid audio file (MP3, WAV, OGG, etc.)');
+          return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+          showError('Audio file must be smaller than 5MB');
+          return;
+        }
+
+        selectedAudio = file;
+        document.getElementById('audioFileName').textContent = file.name;
+        previewContainer.classList.remove('hidden');
+      }
+    }
+
+    async function loadAnnouncementData(announcementId) {
+      const response = await apiCall(`/announcements/${announcementId}`);
+      if (!response?.data) {
+        showError('Failed to load announcement');
+        return;
+      }
+
+      const announcement = response.data;
+      document.getElementById('pageTitle').textContent = 'Edit Announcement';
+      document.getElementById('submitBtnText').textContent = 'Update Announcement';
+
+      document.getElementById('title').value = announcement.title;
+      document.getElementById('transcript').value = announcement.transcript || '';
+      document.getElementById('published').checked = announcement.published;
+    }
+
+    function setupFormHandling() {
+      document.getElementById('announcementForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!editAnnouncementId && !selectedAudio) {
+          showError('Please select an audio file');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('title', document.getElementById('title').value);
+        formData.append('transcript', document.getElementById('transcript').value);
+        formData.append('published', document.getElementById('published').checked);
+
+        if (selectedAudio) {
+          formData.append('audio', selectedAudio);
+        }
+
+        const method = editAnnouncementId ? 'PUT' : 'POST';
+        const endpoint = editAnnouncementId ? `/announcements/${editAnnouncementId}` : '/announcements';
+
+        try {
+          const response = await apiCall(endpoint, {
+            method,
+            body: formData,
+            headers: {}
+          });
+
+          if (response) {
+            showSuccess(editAnnouncementId ? 'Announcement updated!' : 'Announcement created!');
+            setTimeout(() => {
+              window.location.href = '/announcements.html';
+            }, 1500);
+          }
+        } catch (error) {
+          console.error('Form submission error:', error);
+        }
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>

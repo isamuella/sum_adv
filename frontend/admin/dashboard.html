@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - CivicEvents</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body class="bg-gray-50">
+
+  <!-- Navigation Bar -->
+  <nav class="navbar bg-white sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <a href="/index.html" class="flex items-center space-x-2">
+          <span class="text-2xl font-bold text-gray-800">CivicEvents</span>
+        </a>
+        <div class="flex items-center space-x-4">
+          <button id="logoutBtn" class="btn-danger btn-small">Logout</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-gray-800">Admin Dashboard</h1>
+      <p class="text-gray-600 mt-2">Manage your civic events platform</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+      <!-- Total Events -->
+      <div class="card hover:shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 font-medium text-sm">Published Events</p>
+            <p class="text-3xl font-bold text-blue-600 mt-2" id="statPublishedEvents">0</p>
+          </div>
+          <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Promos -->
+      <div class="card hover:shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 font-medium text-sm">Published Promos</p>
+            <p class="text-3xl font-bold text-green-600 mt-2" id="statPublishedPromos">0</p>
+          </div>
+          <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Users -->
+      <div class="card hover:shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 font-medium text-sm">Total Users</p>
+            <p class="text-3xl font-bold text-purple-600 mt-2" id="statTotalUsers">0</p>
+          </div>
+          <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Registrations -->
+      <div class="card hover:shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 font-medium text-sm">Event Registrations</p>
+            <p class="text-3xl font-bold text-orange-600 mt-2" id="statRegistrations">0</p>
+          </div>
+          <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+      <div class="card">
+        <h3 class="font-bold text-lg text-gray-800 mb-4">Quick Actions</h3>
+        <div class="space-y-3">
+          <a href="/admin/create-event.html" class="block btn-primary text-center py-2">Create Event</a>
+          <a href="/admin/create-promo.html" class="block btn-primary text-center py-2">Create Promotion</a>
+          <a href="/admin/create-announcement.html" class="block btn-primary text-center py-2">Create Announcement</a>
+          <a href="/admin/users.html" class="block btn-secondary text-center py-2">Manage Users</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="font-bold text-lg text-gray-800 mb-4">Management</h3>
+        <div class="space-y-3">
+          <a href="/events.html" class="block btn-secondary text-center py-2">View All Events</a>
+          <a href="/promos.html" class="block btn-secondary text-center py-2">View All Promos</a>
+          <a href="/announcements.html" class="block btn-secondary text-center py-2">View All Announcements</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">Recent Activity</h2>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Recent Events -->
+        <div class="card">
+          <h3 class="font-bold text-lg text-gray-800 mb-4">Recently Created Events</h3>
+          <div id="recentEventsList" class="space-y-3">
+            <p class="text-gray-500">Loading...</p>
+          </div>
+        </div>
+
+        <!-- Recent Registrations -->
+        <div class="card">
+          <h3 class="font-bold text-lg text-gray-800 mb-4">Recent Registrations</h3>
+          <div id="recentRegistrationsList" class="space-y-3">
+            <p class="text-gray-500">Loading...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- User Activity -->
+    <section>
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">Active Users</h2>
+      <div class="card">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-gray-200">
+                <th class="text-left py-3 px-4 font-bold text-gray-800">Name</th>
+                <th class="text-left py-3 px-4 font-bold text-gray-800">Email</th>
+                <th class="text-left py-3 px-4 font-bold text-gray-800">Role</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="4" class="text-center py-4 text-gray-500">Loading users...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-gray-300 py-12 mt-16">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div>
+          <h3 class="text-white font-bold mb-4">About CivicEvents</h3>
+          <p class="text-sm">Connecting communities through local events and civic engagement.</p>
+        </div>
+        <div>
+          <h3 class="text-white font-bold mb-4">Quick Links</h3>
+          <ul class="text-sm space-y-2">
+            <li><a href="/events.html" class="hover:text-white">Events</a></li>
+            <li><a href="/announcements.html" class="hover:text-white">Announcements</a></li>
+            <li><a href="/promos.html" class="hover:text-white">Promotions</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-white font-bold mb-4">Support</h3>
+          <p class="text-sm">Contact: support@civicevents.com</p>
+          <p class="text-sm">Phone: +250 788 123 456</p>
+        </div>
+      </div>
+      <div class="border-t border-gray-700 pt-8 text-center text-sm">
+        <p>&copy; 2026 CivicEvents. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->  <script type="module" src="../js/app.js"></script>  <script type="module">
+    import { apiCall, logoutUser } from '../js/utils/api.js';
+    import { showError, showSuccess } from '../js/utils/ui-helpers.js';
+
+    if (!window.appState?.isAuthenticated || window.appState.user.role !== 'admin') {
+      window.location.href = '/login.html';
+    }
+
+    async function init() {
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        logoutUser();
+        showSuccess('Logged out');
+        setTimeout(() => window.location.href = '/login.html', 1000);
+      });
+
+      await loadStats();
+      await loadRecentActivity();
+      await loadUsers();
+    }
+
+    async function loadStats() {
+      // Total events
+      const eventsResponse = await apiCall('/events');
+      const events = eventsResponse?.data || [];
+      document.getElementById('statPublishedEvents').textContent = events.filter(e => e.published).length;
+
+      // Total promos
+      const promosResponse = await apiCall('/promos');
+      const promos = promosResponse?.data || [];
+      document.getElementById('statPublishedPromos').textContent = promos.filter(p => p.published).length;
+
+      // Total users
+      const usersResponse = await apiCall('/users');
+      const users = usersResponse?.data || [];
+      document.getElementById('statTotalUsers').textContent = users.length;
+
+      // Total registrations (endpoint GET /event-registrations doesn't exist, suppress error)
+      const regsResponse = await apiCall('/event-registrations', { suppressError: true });
+      const registrations = regsResponse?.data || [];
+      document.getElementById('statRegistrations').textContent = registrations.length;
+    }
+
+    async function loadRecentActivity() {
+      // Recent events
+      const eventsResponse = await apiCall('/events');
+      const events = eventsResponse?.data?.slice(0, 5) || [];
+      
+      if (events.length === 0) {
+        document.getElementById('recentEventsList').innerHTML = '<p class="text-gray-500">No recent events</p>';
+      } else {
+        document.getElementById('recentEventsList').innerHTML = events.map(event => `
+          <div class="border-l-4 border-blue-500 pl-4 py-2">
+            <p class="font-medium text-gray-800">${event.title}</p>
+            <p class="text-xs text-gray-500">${new Date(event.created_at).toLocaleDateString()}</p>
+            <p class="text-sm text-gray-600">${event.published ? '✓ Published' : '⊙ Draft'}</p>
+          </div>
+        `).join('');
+      }
+
+      // Recent registrations (endpoint GET /event-registrations doesn't exist, suppress error)
+      const regsResponse = await apiCall('/event-registrations', { suppressError: true });
+      const registrations = regsResponse?.data?.slice(0, 5) || [];
+      
+      if (registrations.length === 0) {
+        document.getElementById('recentRegistrationsList').innerHTML = '<p class="text-gray-500">No recent registrations</p>';
+      } else {
+        document.getElementById('recentRegistrationsList').innerHTML = registrations.map(reg => `
+          <div class="border-l-4 border-green-500 pl-4 py-2">
+            <p class="font-medium text-gray-800">${reg.user?.full_name || 'Unknown'}</p>
+            <p class="text-xs text-gray-500">Event: ${reg.event?.title || 'Unknown'}</p>
+            <p class="text-xs text-gray-500">${new Date(reg.created_at).toLocaleDateString()}</p>
+          </div>
+        `).join('');
+      }
+    }
+
+    async function loadUsers() {
+      const response = await apiCall('/users');
+      const users = response?.data || [];
+
+      if (users.length === 0) {
+        document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-500">No users found</td></tr>';
+        return;
+      }
+
+      document.getElementById('usersTableBody').innerHTML = users.slice(0, 10).map(user => `
+        <tr class="border-b border-gray-200 hover:bg-gray-50">
+          <td class="py-3 px-4">${user.full_name}</td>
+          <td class="py-3 px-4">${user.email}</td>
+          <td class="py-3 px-4">
+            <span class="badge ${user.role === 'admin' ? 'badge-primary' : 'badge-success'}">
+              ${user.role}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    init();
+  </script>
+</body>
+</html>

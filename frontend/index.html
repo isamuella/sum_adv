@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - CivicEvents</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gray-50">
+
+  <!-- Navigation Bar -->
+  <nav class="navbar bg-white sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <!-- Logo -->
+        <a href="/index.html" class="flex items-center space-x-2">
+          <span class="text-2xl font-bold text-gray-800">CivicEvents</span>
+        </a>
+
+        <!-- Center Navigation Links -->
+        <div class="hidden md:flex space-x-6">
+          <a href="/index.html" class="nav-link active font-medium">Dashboard</a>
+          <a href="/events.html" class="nav-link font-medium">Events</a>
+          <a href="/announcements.html" class="nav-link font-medium">Announcements</a>
+          <a href="/promos.html" class="nav-link font-medium">Promos</a>
+        </div>
+
+        <!-- Right Side: Notifications, Profile, Logout -->
+        <div class="flex items-center space-x-4">
+          <!-- Notifications Bell -->
+          <button id="notificationBell" class="relative text-gray-700 hover:text-blue-600 transition" aria-label="Notifications">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0018 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+            </svg>
+            <span id="notificationCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
+          </button>
+
+          <!-- Profile Dropdown -->
+          <div class="relative group">
+            <button id="profileBtn" class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition" aria-label="User menu">
+              <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                <span id="userInitial">U</span>
+              </div>
+            </button>
+            <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+              <p class="px-4 py-2 text-sm text-gray-600">Signed in as</p>
+              <p id="userName" class="px-4 font-semibold text-gray-800">User Name</p>
+              <hr class="my-2">
+              <a href="/profile.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">My Profile</a>
+              <a href="/my-registrations.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 transition">My Registrations</a>
+              <div id="adminPanelLink" class="hidden">
+                <hr class="my-2">
+                <a href="/admin/dashboard.html" class="block px-4 py-2 text-blue-600 hover:bg-blue-50 transition font-medium">Admin Panel</a>
+              </div>
+              <hr class="my-2">
+              <button id="logoutBtn" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition">Logout</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Welcome Section -->
+    <section class="mb-12">
+      <h1 class="text-4xl font-bold text-gray-800">Welcome back, <span id="userFirstName">User</span>!</h1>
+      <p class="text-gray-600 mt-2 text-lg">Track your civic engagement and discover local events</p>
+    </section>
+
+    <!-- Quick Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+      <!-- Total Events Card -->
+      <div class="card hover:shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 font-medium text-sm">Total Events</p>
+            <p class="text-3xl font-bold text-blue-600 mt-2" id="statsEvents">0</p>
+          </div>
+          <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- My Registrations Card -->
+      <div class="card hover:shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 font-medium text-sm">My Registrations</p>
+            <p class="text-3xl font-bold text-green-600 mt-2" id="statsRegistrations">0</p>
+          </div>
+          <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Announcements Card -->
+      <div class="card hover:shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 font-medium text-sm">Announcements</p>
+            <p class="text-3xl font-bold text-purple-600 mt-2" id="statsAnnouncements">0</p>
+          </div>
+          <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M2 8c0-1.1.9-2 2-2h5l9-5v18l-9-5H4c-1.1 0-2-.9-2-2V8zm16-3v10h3l2-2v-6l-2-2h-3z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unread Notifications Card -->
+      <div class="card hover:shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 font-medium text-sm">Unread Notifications</p>
+            <p class="text-3xl font-bold text-orange-600 mt-2" id="statsNotifications">0</p>
+          </div>
+          <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Events Section -->
+    <section class="mb-12">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Upcoming Events</h2>
+        <a href="/events.html" class="text-blue-600 hover:text-blue-700 font-medium">View All →</a>
+      </div>
+      <div id="recentEventsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Loading skeleton -->
+        <div class="card animate-pulse">
+          <div class="h-40 bg-gray-300 rounded mb-4"></div>
+          <div class="h-6 bg-gray-300 rounded mb-2"></div>
+          <div class="h-4 bg-gray-300 rounded w-3/4"></div>
+        </div>
+        <div class="card animate-pulse">
+          <div class="h-40 bg-gray-300 rounded mb-4"></div>
+          <div class="h-6 bg-gray-300 rounded mb-2"></div>
+          <div class="h-4 bg-gray-300 rounded w-3/4"></div>
+        </div>
+        <div class="card animate-pulse">
+          <div class="h-40 bg-gray-300 rounded mb-4"></div>
+          <div class="h-6 bg-gray-300 rounded mb-2"></div>
+          <div class="h-4 bg-gray-300 rounded w-3/4"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- My Registrations Section -->
+    <section>
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">My Registered Events</h2>
+        <a href="/my-registrations.html" class="text-blue-600 hover:text-blue-700 font-medium">View All →</a>
+      </div>
+      <div id="myRegistrationsList" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <p class="text-gray-500">Loading your registrations...</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-gray-300 py-12 mt-16">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div>
+          <h3 class="text-white font-bold mb-4">About CivicEvents</h3>
+          <p class="text-sm">Connecting communities through local events and civic engagement.</p>
+        </div>
+        <div>
+          <h3 class="text-white font-bold mb-4">Quick Links</h3>
+          <ul class="text-sm space-y-2">
+            <li><a href="/events.html" class="hover:text-white">Events</a></li>
+            <li><a href="/announcements.html" class="hover:text-white">Announcements</a></li>
+            <li><a href="/promos.html" class="hover:text-white">Promotions</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-white font-bold mb-4">Support</h3>
+          <p class="text-sm">Contact: support@civicevents.local</p>
+          <p class="text-sm">Phone: (123) 456-7890</p>
+        </div>
+      </div>
+      <div class="border-t border-gray-700 pt-8 text-center text-sm">
+        <p>&copy; 2026 CivicEvents. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="./js/app.js"></script>
+  <script type="module">
+    import { apiCall, logoutUser } from './js/utils/api.js';
+    import { showError, showSuccess } from './js/utils/ui-helpers.js';
+    
+    // Check if user is authenticated
+    if (!window.appState?.isAuthenticated) {
+      window.location.href = '/login.html';
+    } else {
+      initializeDashboard();
+    }
+
+    async function initializeDashboard() {
+      const user = window.appState.user;
+      
+      // Display user name
+      document.getElementById('userName').textContent = user.full_name;
+      document.getElementById('userFirstName').textContent = user.full_name.split(' ')[0];
+      document.getElementById('userInitial').textContent = user.full_name.charAt(0).toUpperCase();
+
+      // Show admin panel link if admin
+      if (user.role === 'admin') {
+        document.getElementById('adminPanelLink').classList.remove('hidden');
+      }
+
+      // Profile dropdown toggle
+      document.getElementById('profileBtn').addEventListener('click', () => {
+        document.getElementById('profileDropdown').classList.toggle('hidden');
+      });
+
+      // Logout
+      document.getElementById('logoutBtn').addEventListener('click', () => {
+        logoutUser();
+        showSuccess('You have been logged out');
+        setTimeout(() => {
+          window.location.href = '/login.html';
+        }, 1000);
+      });
+
+      // Load dashboard data
+      await loadDashboardStats();
+      await loadRecentEvents();
+      await loadMyRegistrations();
+    }
+
+    async function loadDashboardStats() {
+      const response = await apiCall('/events');
+      if (response && response.data) {
+        document.getElementById('statsEvents').textContent = response.data.length;
+      }
+
+      const regsResponse = await apiCall('/event-registrations/my-registrations');
+      if (regsResponse && regsResponse.data) {
+        document.getElementById('statsRegistrations').textContent = regsResponse.data.length;
+      }
+
+      const announcementsResponse = await apiCall('/announcements');
+      if (announcementsResponse && announcementsResponse.data) {
+        document.getElementById('statsAnnouncements').textContent = announcementsResponse.data.length;
+      }
+
+      const notificationsResponse = await apiCall('/notifications');
+      if (notificationsResponse && notificationsResponse.data) {
+        const unreadCount = notificationsResponse.data.filter(n => !n.read).length;
+        document.getElementById('statsNotifications').textContent = unreadCount;
+        document.getElementById('notificationCount').textContent = unreadCount;
+      }
+    }
+
+    async function loadRecentEvents() {
+      const response = await apiCall('/events');
+      const container = document.getElementById('recentEventsList');
+      
+      if (!response || !response.data || response.data.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 col-span-full">No events available</p>';
+        return;
+      }
+
+      const recentEvents = response.data.filter(e => e.published).slice(0, 3);
+      
+      container.innerHTML = recentEvents.map(event => `
+        <div class="card cursor-pointer hover:shadow-lg transition" onclick="window.location.href='/events.html?id=${event.id}'">
+          ${event.metadata?.image_url ? `
+            <img src="${event.metadata.image_url}" alt="${event.title}" class="w-full h-40 object-cover rounded-lg mb-4">
+          ` : `
+            <div class="w-full h-40 bg-gray-300 rounded-lg mb-4 flex items-center justify-center">
+              <svg class="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path>
+              </svg>
+            </div>
+          `}
+          <h3 class="font-bold text-lg text-gray-800">${event.title}</h3>
+          <p class="text-gray-600 text-sm mt-1">${event.location}</p>
+          <p class="text-xs text-gray-500 mt-2">
+            📅 ${new Date(event.starts_at).toLocaleDateString()}
+          </p>
+        </div>
+      `).join('');
+    }
+
+    async function loadMyRegistrations() {
+      const response = await apiCall('/event-registrations/my-registrations');
+      const container = document.getElementById('myRegistrationsList');
+      
+      if (!response || !response.data || response.data.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 col-span-full">You haven\'t registered for any events yet</p>';
+        return;
+      }
+
+      const registrations = response.data.slice(0, 2);
+      
+      container.innerHTML = registrations.map(reg => `
+        <div class="card border-l-4 border-green-500">
+          <h3 class="font-bold text-lg text-gray-800">${reg.event?.title || 'Event'}</h3>
+          <p class="text-gray-600 text-sm mt-2">
+            📍 ${reg.event?.location || 'TBA'}
+          </p>
+          <p class="text-xs text-gray-500 mt-2">
+            Registered on ${new Date(reg.created_at).toLocaleDateString()}
+          </p>
+          <button class="mt-4 btn-secondary btn-small" onclick="window.location.href='/events.html?id=${reg.event_id}'">
+            View Event
+          </button>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events - CivicEvents</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="bg-gray-50">
+  <!-- Navigation Bar -->
+  <nav class="navbar bg-white sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <a href="/index.html" class="flex items-center space-x-2">
+          <span class="text-2xl font-bold text-gray-800">CivicEvents</span>
+        </a>
+        <div class="hidden md:flex space-x-6">
+          <a href="/index.html" class="nav-link font-medium">Dashboard</a>
+          <a href="/events.html" class="nav-link font-medium active">Events</a>
+          <a href="/announcements.html" class="nav-link font-medium">Announcements</a>
+          <a href="/promos.html" class="nav-link font-medium">Promos</a>
+        </div>
+        <div class="flex items-center space-x-4">
+          <a id="adminPanelLink" href="/admin/dashboard.html" class="hidden nav-link font-medium">Admin Panel</a>
+          <button id="createEventBtn" class="btn-primary hidden">+ Create Event</button>
+          <button id="notificationBell" class="relative text-gray-700">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0018 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+            </svg>
+            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
+          </button>
+          <div class="relative">
+            <button id="profileBtn" class="flex items-center space-x-2 text-gray-700">
+              <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                <span id="userInitial">U</span>
+              </div>
+            </button>
+            <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+              <p class="px-4 py-2 text-sm text-gray-600">Hi, <span id="userName"></span></p>
+              <hr class="my-2">
+              <a href="/profile.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View Profile</a>
+              <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">Logout</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Events</h1>
+    
+    <!-- Filters -->
+    <div class="bg-white p-4 rounded-lg shadow mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <input type="text" id="searchInput" placeholder="Search by title or location" class="p-2 border border-gray-300 rounded focus:ring focus:ring-blue-300">
+        <input type="date" id="dateFromInput" class="p-2 border border-gray-300 rounded focus:ring focus:ring-blue-300">
+        <input type="date" id="dateToInput" class="p-2 border border-gray-300 rounded focus:ring focus:ring-blue-300">
+        <div class="flex gap-2">
+          <button id="filterBtn" class="flex-1 btn-primary">Filter</button>
+          <button id="clearFilterBtn" class="flex-1 btn-secondary">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Events Grid -->
+    <div id="eventsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"></div>
+
+    <!-- Pagination -->
+    <div id="paginationContainer" class="flex justify-center gap-2"></div>
+  </div>
+
+  <!-- Event Detail Modal -->
+  <div id="eventModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-gray-800">Event Details</h2>
+        <button id="closeModalBtn" class="text-gray-600 hover:text-gray-800 text-2xl">&times;</button>
+      </div>
+      <div id="modalContent" class="p-6"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white mt-12">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <h3 class="font-bold text-lg mb-2">CivicEvents</h3>
+          <p class="text-gray-400">Connecting communities through events</p>
+        </div>
+        <div>
+          <h3 class="font-bold text-lg mb-2">Quick Links</h3>
+          <ul class="space-y-1 text-gray-400">
+            <li><a href="/index.html" class="hover:text-white">Dashboard</a></li>
+            <li><a href="/events.html" class="hover:text-white">Events</a></li>
+            <li><a href="/announcements.html" class="hover:text-white">Announcements</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-bold text-lg mb-2">Contact</h3>
+          <p class="text-gray-400">support@civicevents.com</p>
+          <p class="text-gray-400">+250 788 123 456</p>
+        </div>
+      </div>
+      <div class="border-t border-gray-700 pt-8 text-center text-sm">
+        <p>&copy; 2026 CivicEvents. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { apiCall } from './js/utils/api.js';
+    import { showError, showSuccess } from './js/utils/ui-helpers.js';
+    import { TOKEN_KEY, USER_KEY } from './js/config.js';
+
+    // Global state
+    let allEvents = [];
+    let currentPage = 1;
+    const pageSize = 6;
+
+    // Initialize app state
+    function initAppState() {
+      const token = localStorage.getItem(TOKEN_KEY);
+      const user = localStorage.getItem(USER_KEY);
+      
+      window.appState = {
+        user: null,
+        token: null,
+        isAuthenticated: false
+      };
+
+      if (token && user) {
+        try {
+          window.appState.token = token;
+          window.appState.user = JSON.parse(user);
+          window.appState.isAuthenticated = true;
+        } catch (e) {
+          localStorage.removeItem(TOKEN_KEY);
+          localStorage.removeItem(USER_KEY);
+        }
+      }
+    }
+
+    function checkAuth() {
+      if (!window.appState?.isAuthenticated) {
+        window.location.href = '/login.html';
+      }
+    }
+
+    async function loadEvents() {
+      try {
+        const response = await apiCall('/events');
+        const user = window.appState?.user || {};
+        allEvents = (response?.data || []).filter(e => user.role === 'admin' || e.published);
+        currentPage = 1;
+        displayEvents();
+      } catch (err) {
+        showError('Failed to load events');
+      }
+    }
+
+    function displayEvents() {
+      const start = (currentPage - 1) * pageSize;
+      const pageEvents = allEvents.slice(start, start + pageSize);
+
+      if (pageEvents.length === 0) {
+        document.getElementById('eventsList').innerHTML = '<p class="text-gray-500">No events found</p>';
+        return;
+      }
+
+      let html = '';
+      pageEvents.forEach(event => {
+        html += '<div class="bg-white rounded-lg shadow p-4 cursor-pointer hover:shadow-lg transition" onclick="window.showEventDetail(\'' + event.id + '\')">';
+        if (event.metadata?.image_url) {
+          html += '<img src="' + event.metadata.image_url + '" alt="' + event.title + '" class="w-full h-40 object-cover rounded-lg mb-4">';
+        }
+        html += '<h3 class="font-bold text-lg text-gray-800">' + event.title + '</h3>';
+        html += '<p class="text-gray-600 text-sm mt-2">' + event.description.substring(0, 100) + '...</p>';
+        html += '<div class="text-sm text-gray-600 mt-4">📍 ' + event.location + '</div>';
+        html += '<div class="text-xs text-gray-500 mt-3">📅 ' + new Date(event.starts_at).toLocaleDateString() + '</div>';
+        html += '</div>';
+      });
+
+      document.getElementById('eventsList').innerHTML = html;
+
+      const totalPages = Math.ceil(allEvents.length / pageSize);
+      const container = document.getElementById('paginationContainer');
+      container.innerHTML = '';
+
+      if (totalPages > 1) {
+        if (currentPage > 1) {
+          const btn = document.createElement('button');
+          btn.textContent = '← Previous';
+          btn.className = 'btn-secondary';
+          btn.onclick = () => { currentPage--; displayEvents(); };
+          container.appendChild(btn);
+        }
+
+        for (let i = 1; i <= totalPages; i++) {
+          const btn = document.createElement('button');
+          btn.textContent = i;
+          btn.className = i === currentPage ? 'btn-primary w-10 h-10' : 'btn-secondary w-10 h-10';
+          btn.onclick = () => { currentPage = i; displayEvents(); };
+          container.appendChild(btn);
+        }
+
+        if (currentPage < totalPages) {
+          const btn = document.createElement('button');
+          btn.textContent = 'Next →';
+          btn.className = 'btn-secondary';
+          btn.onclick = () => { currentPage++; displayEvents(); };
+          container.appendChild(btn);
+        }
+      }
+    }
+
+    // Global function to show event details
+    window.showEventDetail = async function(eventId) {
+      console.log('Opening event:', eventId);
+      try {
+        const response = await apiCall('/events/' + eventId);
+        if (!response?.data) {
+          showError('Failed to load event');
+          return;
+        }
+
+        const event = response.data;
+        const user = window.appState?.user || {};
+
+        // Only admins can view event feedback, regular users will see message
+        let feedbackList = [];
+        let avgRating = 'N/A';
+
+        if (user.role === 'admin') {
+          const feedbackResponse = await apiCall('/event-feedback/event/' + eventId);
+          feedbackList = feedbackResponse?.data || [];
+          avgRating = feedbackList.length > 0 ? (feedbackList.reduce((sum, f) => sum + f.rating, 0) / feedbackList.length).toFixed(1) : 'N/A';
+        }
+
+        let html = '<h3 class="text-2xl font-bold text-gray-800 mb-4">' + event.title + '</h3>';
+        
+        if (event.metadata?.image_url) {
+          html = '<img src="' + event.metadata.image_url + '" alt="' + event.title + '" class="w-full h-64 object-cover rounded-lg mb-6">' + html;
+        }
+
+        html += '<div class="text-sm text-gray-600 mb-4">📍 ' + event.location + ' | 📅 ' + new Date(event.starts_at).toLocaleDateString() + '</div>';
+        html += '<div><h4 class="font-bold text-gray-800 mb-2">Description</h4><p class="text-gray-600">' + event.description + '</p></div>';
+
+        if (user.role === 'admin') {
+          html += '<div><h4 class="font-bold text-gray-800 mb-2">Feedback (' + avgRating + '⭐)</h4>';
+          if (feedbackList.length === 0) {
+            html += '<p class="text-gray-500">No feedback yet</p>';
+          } else {
+            html += '<div class="space-y-3">';
+            feedbackList.forEach(f => {
+              html += '<div class="bg-gray-50 p-3 rounded"><div>' + Array(f.rating).fill('⭐').join('') + '</div><p class="text-sm text-gray-600">' + f.comment + '</p></div>';
+            });
+            html += '</div>';
+          }
+          html += '</div>';
+        } else {
+          html += '<div><h4 class="font-bold text-gray-800 mb-2">Feedback</h4><p class="text-gray-500">Event feedback is visible to administrators only.</p></div>';
+        }
+
+        if (user.role === 'admin') {
+          const regResponse = await apiCall('/event-registrations/event/' + eventId + '/attendees');
+          const registrants = regResponse?.data || [];
+          html += '<div class="border-t pt-4"><h4 class="font-bold text-gray-800 mb-2">Registrants (' + registrants.length + ')</h4>';
+          if (registrants.length === 0) {
+            html += '<p class="text-gray-500">None</p>';
+          } else {
+            registrants.forEach(r => {
+              html += '<div class="text-sm text-gray-600 py-1">' + (r.user?.full_name || 'Unknown') + '</div>';
+            });
+          }
+          html += '</div>';
+        }
+
+        if (user.role === 'user') {
+          try {
+            const myRegs = await apiCall('/event-registrations/my-registrations');
+            console.log('My registrations response:', myRegs);
+            const regsArray = myRegs && (Array.isArray(myRegs) ? myRegs : myRegs.data || []);
+            console.log('Registrations array:', regsArray);
+            const isReg = regsArray.some(r => r.event_id == eventId || r.event_id === eventId);
+            console.log('Is user registered for event', eventId, ':', isReg);
+            html += '<div class="mt-6 pt-6 border-t">';
+            if (!isReg) {
+              html += '<button onclick="window.registerEvent(\'' + eventId + '\')" class="w-full btn-primary py-3">Register for Event</button>';
+            } else {
+              html += '<button onclick="window.cancelRegistration(\'' + eventId + '\')" class="w-full btn-danger py-3">Cancel Registration</button>';
+            }
+            html += '</div>';
+          } catch (error) {
+            console.error('Error checking registrations:', error);
+            html += '<div class="mt-6 pt-6 border-t"><p class="text-red-500 text-sm">Unable to check registration status</p></div>';
+          }
+        }
+
+        if (user.role === 'admin') {
+          html += '<div class="flex gap-2 mt-4"><button class="flex-1 btn-secondary py-2" onclick="window.editEvent(\'' + eventId + '\')">Edit</button><button onclick="window.deleteEvent(\'' + eventId + '\')" class="flex-1 btn-danger py-2">Delete</button></div>';
+        }
+
+        document.getElementById('modalContent').innerHTML = html;
+        document.getElementById('eventModal').classList.remove('hidden');
+        document.getElementById('closeModalBtn').onclick = () => document.getElementById('eventModal').classList.add('hidden');
+      } catch (err) {
+        console.error(err);
+        showError('Error loading event');
+      }
+    };
+
+    window.editEvent = function(eventId) {
+      window.location.href = '/admin/create-event.html?id=' + eventId;
+    };
+
+    window.registerEvent = async function(eventId) {
+      try {
+        console.log('Registering for event:', eventId);
+        const response = await apiCall('/event-registrations/register', { method: 'POST', body: JSON.stringify({ event_id: eventId }) });
+        console.log('Registration response:', response);
+        if (response) {
+          showSuccess('Successfully registered for event!');
+          document.getElementById('eventModal').classList.add('hidden');
+          await loadEvents();
+        } else {
+          showError('Failed to register. Please try again.');
+        }
+      } catch (err) {
+        console.error('Registration error:', err);
+        showError('Failed to register for event. Please try again.');
+      }
+    };
+
+    window.cancelRegistration = async function(eventId) {
+      if (!confirm('Cancel registration?')) return;
+      try {
+        console.log('Cancelling registration for event:', eventId);
+        const response = await apiCall('/event-registrations/cancel', { method: 'POST', body: JSON.stringify({ event_id: eventId }) });
+        console.log('Cancel response:', response);
+        if (response) {
+          showSuccess('Registration cancelled successfully!');
+          document.getElementById('eventModal').classList.add('hidden');
+          await loadEvents();
+        } else {
+          showError('Failed to cancel registration. Please try again.');
+        }
+      } catch (err) {
+        console.error('Cancel error:', err);
+        showError('Failed to cancel registration. Please try again.');
+      }
+    };
+
+    window.deleteEvent = async function(eventId) {
+      if (!confirm('Delete this event?')) return;
+      try {
+        const response = await apiCall('/events/' + eventId, { method: 'DELETE' });
+        if (response) {
+          showSuccess('Deleted!');
+          document.getElementById('eventModal').classList.add('hidden');
+          loadEvents();
+        }
+      } catch (err) {
+        showError('Error deleting');
+      }
+    };
+
+    // Event Listeners
+    document.getElementById('filterBtn').addEventListener('click', () => {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const dateFrom = document.getElementById('dateFromInput').value;
+      const dateTo = document.getElementById('dateToInput').value;
+
+      const filteredEvents = allEvents.filter(event => {
+        const matchesSearch = !search || event.title.toLowerCase().includes(search) || event.location.toLowerCase().includes(search);
+        const eventDate = new Date(event.starts_at).toISOString().split('T')[0];
+        const matchesDateFrom = !dateFrom || eventDate >= dateFrom;
+        const matchesDateTo = !dateTo || eventDate <= dateTo;
+        return matchesSearch && matchesDateFrom && matchesDateTo;
+      });
+      
+      allEvents = filteredEvents;
+      currentPage = 1;
+      displayEvents();
+    });
+
+    document.getElementById('clearFilterBtn').addEventListener('click', loadEvents);
+    
+    document.getElementById('notificationBell').addEventListener('click', () => {
+      window.location.href = '/notifications.html';
+    });
+
+    document.getElementById('profileBtn').addEventListener('click', () => {
+      document.getElementById('profileDropdown').classList.toggle('hidden');
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.clear();
+      window.location.href = '/login.html';
+    });
+
+    document.getElementById('createEventBtn').addEventListener('click', () => {
+      window.location.href = '/admin/create-event.html';
+    });
+
+    // Initialize page
+    initAppState();
+    checkAuth();
+
+    const user = window.appState?.user || {};
+    document.getElementById('userName').textContent = user.full_name || 'User';
+    document.getElementById('userInitial').textContent = (user.full_name?.charAt(0) || 'U').toUpperCase();
+
+    if (user.role === 'admin') {
+      document.getElementById('adminPanelLink').classList.remove('hidden');
+      document.getElementById('createEventBtn').classList.remove('hidden');
+    }
+
+    loadEvents();
+  </script>
+</body>
+</html>

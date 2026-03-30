@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications - CivicEvents</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    html {
+      scrollbar-gutter: stable;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+  <!-- Navigation Bar -->
+  <nav class="navbar bg-white sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <!-- Logo -->
+        <a href="/index.html" class="flex items-center space-x-2">
+          <span class="text-2xl font-bold text-gray-800">CivicEvents</span>
+        </a>
+
+        <!-- Center Navigation Links -->
+        <div class="hidden md:flex space-x-6">
+          <a href="/index.html" class="nav-link font-medium">Dashboard</a>
+          <a href="/events.html" class="nav-link font-medium">Events</a>
+          <a href="/announcements.html" class="nav-link font-medium">Announcements</a>
+          <a href="/promos.html" class="nav-link font-medium">Promos</a>
+        </div>
+
+        <!-- Right Side: Notifications, Profile, Logout -->
+        <div class="flex items-center space-x-4">
+          <!-- Notifications Bell -->
+          <button id="notificationBell" class="relative text-gray-700 hover:text-blue-600 transition" aria-label="Notifications">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0018 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+            </svg>
+            <span id="notificationCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
+          </button>
+
+          <!-- Profile Dropdown -->
+          <div class="relative group">
+            <button id="profileBtn" class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition" aria-label="User menu">
+              <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                <span id="userInitial">U</span>
+              </div>
+            </button>
+            <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+              <p class="px-4 py-2 text-sm text-gray-600">Signed in as</p>
+              <p id="dropdownEmail" class="px-4 py-0 text-sm font-semibold text-gray-800"></p>
+              <hr class="my-2">
+              <a href="/profile.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View Profile</a>
+              <a href="#" id="logoutBtn" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">Notifications</h1>
+    <p class="text-gray-600 mb-8">Stay updated on events, registrations, and community news</p>
+
+    <!-- Filter Options -->
+    <div class="mb-6 flex flex-wrap gap-2">
+      <button class="filter-btn active px-4 py-2 rounded-full border-2 border-blue-500 bg-blue-50 text-blue-600 font-medium" data-type="all">All</button>
+      <button class="filter-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-600 hover:border-blue-500" data-type="event">Events</button>
+      <button class="filter-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-600 hover:border-blue-500" data-type="registration">Registrations</button>
+      <button class="filter-btn px-4 py-2 rounded-full border-2 border-gray-300 text-gray-600 hover:border-blue-500" data-type="feedback">Feedback</button>
+      <button id="markAllRead" class="ml-auto px-4 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 font-medium">Mark All as Read</button>
+    </div>
+
+    <!-- Notifications List -->
+    <div id="notificationsList" class="space-y-4">
+      <!-- Notifications will be loaded here -->
+      <div class="text-center py-12">
+        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0018 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+        </svg>
+        <p class="text-gray-500 text-lg">No notifications yet</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-gray-300 text-center py-4 mt-12">
+    <p>&copy; 2026 CivicEvents. All rights reserved.</p>
+  </footer>
+
+  <script type="module" src="./js/app.js"></script>
+  <script type="module">
+    import { apiCall, logoutUser } from './js/utils/api.js';
+    import { showError, showSuccess } from './js/utils/ui-helpers.js';
+
+    // Store all notifications for filtering
+    let allNotifications = [];
+
+    // Redirect if not authenticated
+    function redirectIfNotAuthenticated() {
+      if (!window.appState.isAuthenticated) {
+        window.location.href = '/login.html';
+      }
+    }
+
+    // Initialize page
+    async function initPage() {
+      redirectIfNotAuthenticated();
+      updateUserInfo();
+      await loadNotifications();
+    }
+
+    // Update user info in navbar
+    function updateUserInfo() {
+      const user = window.appState.user;
+      if (user) {
+        document.getElementById('userInitial').textContent = (user.full_name || 'U')[0].toUpperCase();
+        document.getElementById('dropdownEmail').textContent = user.email;
+      }
+    }
+
+    // Load notifications from API
+    async function loadNotifications() {
+      try {
+        const response = await apiCall('/notifications');
+        allNotifications = Array.isArray(response) ? response : (response?.data || []);
+        displayNotifications(allNotifications);
+        document.getElementById('notificationCount').textContent = allNotifications.filter(n => !n.read).length;
+      } catch (err) {
+        showError('Failed to load notifications');
+      }
+    }
+
+    // Display notifications
+    function displayNotifications(notifications) {
+      const listContainer = document.getElementById('notificationsList');
+      
+      if (notifications.length === 0) {
+        listContainer.innerHTML = `
+          <div class="text-center py-12">
+            <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0018 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+            </svg>
+            <p class="text-gray-500 text-lg">No notifications</p>
+          </div>
+        `;
+        return;
+      }
+
+      listContainer.innerHTML = notifications.map(notif => `
+        <div class="card p-4 border-l-4 ${notif.read ? 'border-gray-300 bg-gray-50' : 'border-blue-500 bg-blue-50'} hover:shadow-md transition cursor-pointer" data-id="${notif.id}">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="badge ${getNotificationTypeColor(notif.type)}">${notif.type}</span>
+                ${!notif.read ? '<span class="badge badge-blue">New</span>' : ''}
+              </div>
+              <h3 class="font-semibold text-gray-800">${notif.title}</h3>
+              <p class="text-gray-600 text-sm mt-1">${notif.message}</p>
+              <p class="text-gray-500 text-xs mt-2">${new Date(notif.created_at).toLocaleString()}</p>
+            </div>
+            <button class="delete-notif ml-4 text-gray-400 hover:text-red-500 transition" aria-label="Delete notification">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      // Add event listeners
+      document.querySelectorAll('.delete-notif').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const card = e.target.closest('.card');
+          card.remove();
+          showSuccess('Notification deleted');
+        });
+      });
+    }
+
+    function getNotificationTypeColor(type) {
+      const colors = {
+        'event': 'badge-blue',
+        'registration': 'badge-green',
+        'feedback': 'badge-purple',
+        'announcement': 'badge-yellow'
+      };
+      return colors[type] || 'badge-gray';
+    }
+
+    // Filter notifications
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => {
+          b.classList.remove('active', 'border-blue-500', 'bg-blue-50', 'text-blue-600');
+          b.classList.add('border-gray-300', 'text-gray-600');
+        });
+        btn.classList.add('active', 'border-blue-500', 'bg-blue-50', 'text-blue-600');
+        btn.classList.remove('border-gray-300', 'text-gray-600');
+        
+        // Filter and display
+        const type = btn.getAttribute('data-type');
+        const filtered = type === 'all' ? allNotifications : allNotifications.filter(n => n.type === type);
+        displayNotifications(filtered);
+      });
+    });
+
+    // Mark all as read
+    document.getElementById('markAllRead').addEventListener('click', () => {
+      document.querySelectorAll('.card').forEach(card => {
+        card.classList.remove('border-blue-500', 'bg-blue-50');
+        card.classList.add('border-gray-300', 'bg-gray-50');
+      });
+      showSuccess('All notifications marked as read');
+    });
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      logoutUser();
+    });
+
+    // Profile dropdown toggle
+    document.getElementById('profileBtn').addEventListener('click', () => {
+      const dropdown = document.getElementById('profileDropdown');
+      dropdown.classList.toggle('hidden');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#profileBtn') && !e.target.closest('#profileDropdown')) {
+        document.getElementById('profileDropdown').classList.add('hidden');
+      }
+    });
+
+    // Initialize on DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initPage);
+    } else {
+      initPage();
+    }
+  </script>
+
+</body>
+</html>
